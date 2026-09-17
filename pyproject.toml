@@ -8,4 +8,5 @@ dependencies = [
     "groq>=1.7.0",
     "gunicorn>=26.2.0",
     "python-dotenv>=1.2.3",
+    "twilio>=9.11.1",
 ]

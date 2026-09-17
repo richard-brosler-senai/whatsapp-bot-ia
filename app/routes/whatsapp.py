@@ -1,4 +1,5 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, Response, request
+from twilio.twiml.messaging_response import MessagingResponse
 
 
 whatsapp_bp = Blueprint(
@@ -8,13 +9,34 @@ whatsapp_bp = Blueprint(
 )
 
 
-@whatsapp_bp.route("/whatsapp", methods=["POST"])
+@whatsapp_bp.route(
+    "/whatsapp",
+    methods=["POST"]
+)
 def whatsapp():
-    mensagem = request.form.get("Body", "")
-    remetente = request.form.get("From", "")
 
-    print(f"Mensagem recebida de {remetente}: {mensagem}")
+    message = request.form.get(
+        "Body",
+        ""
+    ).strip()
 
-    return jsonify({
-        "status": "received"
-    })
+    sender = request.form.get(
+        "From",
+        ""
+    )
+
+    print(
+        f"WhatsApp recebido "
+        f"de {sender}: {message}"
+    )
+
+    response = MessagingResponse()
+
+    response.message(
+        f"Recebi sua mensagem: {message}"
+    )
+
+    return Response(
+        str(response),
+        mimetype="text/xml"
+    )
