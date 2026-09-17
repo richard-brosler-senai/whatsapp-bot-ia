@@ -39,16 +39,18 @@ function addMessage(text, type) {
             : "bot-message"
     );
 
-    message.textContent = text;
+    message.innerHTML = text;
 
     chatElement.appendChild(message);
 
     chatElement.scrollTop =
         chatElement.scrollHeight;
+
+    return message;
 }
 
 
-function sendMessage() {
+async function sendMessage() {
 
     const text = messageInput.value.trim();
 
@@ -60,16 +62,65 @@ function sendMessage() {
 
     messageInput.value = "";
 
-    // Resposta temporária
-    setTimeout(() => {
+    messageInput.disabled = true;
+    sendButton.disabled = true;
+
+    const loadingMessage =
+        addMessage("Pensando...", "bot");
+
+    try {
+
+        const response = await fetch("/api/chat", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                message: text
+            })
+        });
+
+        const data = await response.json();
+
+        loadingMessage.remove();
+
+        if (!response.ok) {
+
+            addMessage(
+                data.error ||
+                "Não foi possível processar a mensagem.",
+                "bot"
+            );
+
+            return;
+        }
 
         addMessage(
-            "A integração com a Groq será implementada na próxima etapa.",
+            data.answer,
             "bot"
         );
 
-    }, 500);
+    } catch (error) {
 
+        loadingMessage.remove();
+
+        addMessage(
+            "Não foi possível comunicar com o servidor.",
+            "bot"
+        );
+
+        console.error(error);
+
+    } finally {
+
+        messageInput.disabled = false;
+        sendButton.disabled = false;
+
+        messageInput.focus();
+    }
 }
 
 
