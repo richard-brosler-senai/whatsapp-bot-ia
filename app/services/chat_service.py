@@ -11,7 +11,6 @@ Seja educado, objetivo e claro.
 
 Quando não souber uma informação, informe que não sabe
 em vez de inventar uma resposta.
-Nas respostas traga em html ao invés de Markdown.
 """.strip()
 
 
