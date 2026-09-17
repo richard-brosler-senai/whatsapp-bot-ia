@@ -46,6 +46,7 @@ class Settings:
     GROQ_MAX_TOKENS = int(
         os.getenv("GROQ_MAX_TOKENS", "1000")
     )
-
+    # Twilio
+    TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 
 settings = Settings()

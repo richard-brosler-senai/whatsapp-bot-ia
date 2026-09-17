@@ -1,6 +1,7 @@
 from flask import Blueprint, Response, request
 from twilio.twiml.messaging_response import MessagingResponse
 
+from app.security.twilio_validator import validate_twilio_request
 from app.services.chat_service import ChatService
 
 
@@ -15,6 +16,7 @@ whatsapp_bp = Blueprint(
     "/whatsapp",
     methods=["POST"]
 )
+@validate_twilio_request
 def whatsapp():
 
     message = request.form.get(
@@ -29,12 +31,11 @@ def whatsapp():
 
     response = MessagingResponse()
 
-    # Mensagem vazia
     if not message:
 
         response.message(
-            "Por enquanto consigo "
-            "processar apenas mensagens de texto."
+            "Por enquanto consigo processar "
+            "apenas mensagens de texto."
         )
 
         return Response(
@@ -42,7 +43,6 @@ def whatsapp():
             mimetype="text/xml"
         )
 
-    # Proteção básica
     if len(message) > 4000:
 
         response.message(
@@ -56,10 +56,8 @@ def whatsapp():
 
     try:
 
-        print(
-            f"Mensagem recebida "
-            f"de {sender}"
-        )
+        # Não registrar o número completo
+        print("Mensagem WhatsApp recebida.")
 
         chat_service = ChatService()
 
@@ -72,14 +70,13 @@ def whatsapp():
     except Exception as error:
 
         print(
-            f"Erro WhatsApp: "
-            f"{type(error).__name__}: {error}"
+            "Erro WhatsApp: "
+            f"{type(error).__name__}"
         )
 
         response.message(
-            "Não consegui processar sua "
-            "mensagem neste momento. "
-            "Tente novamente em alguns instantes."
+            "Não consegui processar sua mensagem "
+            "neste momento. Tente novamente."
         )
 
     return Response(
